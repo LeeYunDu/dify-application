@@ -1,0 +1,45 @@
+const { VITE_PROJECT_BASE, VITE_APP_BASE_JAVA_API, VITE_APP_BASE_AI_API } = import.meta.env
+
+export const BaseConfig = {
+  portalBaseUrl: `/${String(VITE_PROJECT_BASE)}`,
+  domain: window.origin
+}
+export const applicationApiKey = {
+  '文本生成应用': 'app-ATsd9BagC8KV9iV05GvoQnKS'
+}
+
+// api代理
+export const ApiProxy = {
+  java: {
+    // 主应用
+    main: VITE_APP_BASE_JAVA_API,
+    ai: VITE_APP_BASE_AI_API,
+  },
+  node: {
+    main: ''
+  }
+}
+
+export const App = {
+  domain: location.origin
+}
+
+// 当前项目相关
+export default {
+  project: {
+    id: 421,
+    name: '模版项目',
+    cacheView: true,
+    meta: {
+      // 用到的文件夹id集合
+      folders: []
+    }
+  },
+  component: {
+    prefix: 'el-'
+  },
+  iconfont: {
+    prefix: 'iconfont'
+  },
+  dictData: {}
+}
