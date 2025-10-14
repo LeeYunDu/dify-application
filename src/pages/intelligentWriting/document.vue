@@ -8,6 +8,7 @@
       v-model="state.params.richText"
     />
   </div>
+  <Plugins />
 </template>
 
 
@@ -16,6 +17,7 @@ import { ref ,reactive,onMounted } from 'vue'
 import RichText from '@/components/UI/richText/index.vue'
 import Portal from './components/portal.vue'
 import  { useRoute } from 'vue-router'
+import Plugins from './components/plugins.vue'
 let route = useRoute()
 
 let state = reactive({
