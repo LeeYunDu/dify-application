@@ -49,8 +49,7 @@ class AiMenu implements ISelectMenu {
     PubSub.publish('ai-menu', {
       editor,
       eventKey: value,
-      editContent: editor.getSelectionText(),
-      content: editor.getText()
+      content: editor.getSelectionText(),
     })
 
     // 替换选中的内容
