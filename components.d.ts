@@ -23,6 +23,7 @@ declare module 'vue' {
     Header: typeof import('./src/components/UI/header/src/header.vue')['default']
     Menu: typeof import('./src/components/UI/menu/src/menu.vue')['default']
     Pagination: typeof import('./src/components/UI/pagination/src/pagination.vue')['default']
+    Polish: typeof import('./src/components/UI/richText/components/polish.vue')['default']
     RichText: typeof import('./src/components/UI/richText/index.vue')['default']
     RollList: typeof import('./src/components/roll-list/index.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

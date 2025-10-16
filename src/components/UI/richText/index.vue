@@ -1,5 +1,6 @@
 <template>
   <section class="editor-input">
+  
     <Toolbar
       class="ToolBar"
       :editor="editorRef"
@@ -12,7 +13,13 @@
       :default-config="editorConfig"
       :mode="mode"
       @on-created="handleCreated"
-    />
+      @on-change="onChange"
+      @on-blur="onBlur"
+    >
+
+    </Editor>
+    <Polish :editor="editorRef" v-if="editorRef" ref="polishRef" @mousedown.stop @click.stop />
+
   </section>
 </template>
 
@@ -23,6 +30,10 @@ import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import { ApiProxy } from '@/config/index.ts'
 import { computed,inject,ref,shallowRef,onBeforeUnmount,onMounted } from 'vue'
 import { useStore } from 'vuex'
+import { throttle } from 'lodash-es'
+import PubSub from 'pubsub-js'
+import Polish from './components/polish.vue'
+
 import aiMenuConf from './plugins/ai-menu.ts'
 import aiButtonConf from './plugins/ai-button.ts'
 
@@ -32,6 +43,12 @@ const props = defineProps({
 
 const emits = defineEmits(['update:modelValue'])
 
+const polishRef = ref(null)
+
+let state = reactive({
+  selectContent: '',
+  
+})  
 const store = useStore()
 
 // -------- inject --------
@@ -92,7 +109,25 @@ const editorConfig = computed(() => ({
       },
     }
   },
-  autoFocus: true
+  autoFocus: true,
+  hoverbarKeys:{
+    text:{
+      menuKeys: [
+        'bold',        // 加粗
+        'italic',      // 斜体
+        'underline',   // 下划线
+        'through',     // 删除线
+        'code',        // 行内代码
+        'clearStyle',  // 清除格式
+        '|',           // 菜单分组分割线（可选）
+        'fontSize',    // 字体大小
+        'fontFamily',  // 字体
+        'color',       // 文字颜色
+        'bgColor',      // 背景颜色
+        'AiMenu'
+      ]
+    }
+  }
 }))
 
 // -------- fn --------
@@ -104,7 +139,6 @@ const editorRef = shallowRef()
 
 const valueHtml = computed({
   get () {
-    console.log(props.modelValue,'props.modelValue')
     return props.modelValue
   },
   set (val) {
@@ -114,7 +148,20 @@ const valueHtml = computed({
 
 const handleCreated = editor => {
   editorRef.value = editor
+  // 监听选区变化事件
 }
+
+const onBlur = (editor) => {
+  // polishRef.value.showPolish()
+}
+
+
+
+let  onChange  = (editor) => {
+  throttleChange('string')
+}
+
+
 
 onBeforeUnmount(() => {
   const editor = editorRef.value
@@ -122,8 +169,78 @@ onBeforeUnmount(() => {
   editor.destroy()
 })
 
+/**
+ * 获取选中的文本
+ * @param {string} selectType - 选中的文本类型，默认是字符串,还有种是JSON格式
+ * @returns {string} - 选中的文本
+ */
+function getSelectionText(selectType = 'string') {
+  const editor = editorRef.value
+  if (editor == null) return ''
+  if(selectType === 'json'){
+    state.selectContent = editor.getFragment()
+    return editor.getFragment()
+  }else{
+    state.selectContent = editor.getSelectionText()
+    return editor.getSelectionText()
+  }
+}
+
+let throttleChange = throttle(getSelectionText, 3000)
+
+/**
+ * 获取选中的元素（根据html标签）
+ * @param {string} type - 选中的元素类型，例如：'p'、'h1'等
+ * @returns {Array} - 选中的元素数组
+ */
+function getElemsByType(type) {
+  const editor = editorRef.value
+  if (editor == null) return []
+  return editor.getElemsByType(type)
+}
+
+/**
+ * 在选区插入文本
+ * @param {string} text - 要插入的文本
+ */
+function insertTextAtSelection(text) {
+  const editor = editorRef.value
+  if (editor == null) return
+  editor.insertText(text)
+}
+
+PubSub.subscribe('ai-menu', (msg, data) => {
+  const { editor, eventKey,editContent,content } = data
+  
+  switch (eventKey) {
+    case 'polish':
+      polishRef.value.init({
+        content:content,
+        editContent:editContent
+      })
+      break
+    case 'optimize':
+      editor.insertText('优化')
+      break
+  }
+})
+
+
 onMounted(() => {
 
+})
+onUnmounted(() => {
+  PubSub.unsubscribe('ai-menu')
+})
+
+defineExpose({
+  // ref
+  editor: editorRef,
+
+  // 方法
+  getSelectionText,
+  getElemsByType,
+  insertTextAtSelection
 })
 
 </script>

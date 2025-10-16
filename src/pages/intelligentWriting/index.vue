@@ -82,6 +82,9 @@ import TagSelect from './components/tagSelect.vue'
 import { ElMessage } from 'element-plus'
 import { getAppInfoApi  } from '@/api'
 import { markdownDocx, Packer } from 'markdown-docx'
+import { ApiProxy, applicationApiKey } from '@/config'
+import useApplication from '@/hooks/use-application'
+const prefix = ApiProxy.java.ai
 
 let router = useRouter()
 let tagSelectRef = ref<any>()
@@ -139,7 +142,7 @@ function getAppInfo(){
 
 
 // 文本数据的传输
-function onSucess(richText: string){
+function onSuccess(richText: string){
   let documentId = new Date().getTime().toString()
   sessionStorage.setItem('documentId', documentId)
   sessionStorage.setItem(documentId + 'richText', richText || '')
@@ -150,9 +153,7 @@ function onSucess(richText: string){
     }
   })
 }
-import { ApiProxy, applicationApiKey } from '@/config'
-import useApplication from '@/hooks/use-application'
-const prefix = ApiProxy.java.ai
+
 const userQuery = ref('请帮我写一篇以盗墓为主题的惊悚小说，篇幅为300字')
 
 function onGenerate(){
@@ -165,12 +166,13 @@ function onGenerate(){
 let { onSend,generatedContent } = useApplication({
   apiKey: applicationApiKey['文本生成应用'],
   apiUrl: prefix + '/v1/completion-messages',
+  showLoading: true,
   params: {
     inputs: state.params,
     response_mode: 'streaming',
     user: '1'
   },
-  onSuccess: onSucess,
+  onSuccess: onSuccess,
 })
 
 

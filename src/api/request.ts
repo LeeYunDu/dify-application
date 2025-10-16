@@ -15,10 +15,12 @@ service.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     // config.headers.token = ''
     const token = Cookies.get('token') || ''
+    console.log(token, 'token');
+
     if (token) {
       // 部分项目需要，与后端对接确认
       // config.headers.token = token
-      // config.headers['Authorization'] = 'Bearer ' + token
+      config.headers['Authorization'] = 'Bearer ' + token
     }
     return config
   },

@@ -5,7 +5,8 @@ export const BaseConfig = {
   domain: window.origin
 }
 export const applicationApiKey = {
-  '文本生成应用': 'app-ATsd9BagC8KV9iV05GvoQnKS'
+  '文本生成应用': 'app-ATsd9BagC8KV9iV05GvoQnKS',
+  '文本润色': 'app-Px2Lij9pi1UJL8NLrQ4kXMJx'
 }
 
 // api代理

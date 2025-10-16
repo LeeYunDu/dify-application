@@ -1,14 +1,20 @@
 import { processStreamResponse } from '@/utils/streamProcessor'
 import { ApiProxy, applicationApiKey } from '@/config'
 const prefix = ApiProxy.java.ai
-import { onUnmounted, reactive } from 'vue'
+import { onUnmounted, reactive, ref } from 'vue'
 import { ElLoading } from 'element-plus'
+import { get } from 'lodash-es'
 
 export interface ApplicationOptions {
   apiKey: string,
   apiUrl: string,
   params: Record<string, any>,
+
+  loadingText?: string,
+  showLoading?: boolean,
+
   onSuccess?: (content: string) => void,
+  onError?: (error: any) => void,
 }
 
 export default function useApplication (options: ApplicationOptions) {
@@ -21,6 +27,7 @@ export default function useApplication (options: ApplicationOptions) {
 
   let loadingInstance = null
   let generatedContent = ref('')
+  let isGenerating = ref(false)
 
 
 
@@ -33,7 +40,7 @@ export default function useApplication (options: ApplicationOptions) {
   const handleComplete = async (content, endData) => {
     generatedContent.value = content
     state.usageInfo = endData.metadata?.usage || null
-    state.isGenerating = false
+    isGenerating.value = false
     options.onSuccess?.(content)
   }
 
@@ -41,7 +48,7 @@ export default function useApplication (options: ApplicationOptions) {
   const abortGeneration = () => {
     if (state.abortController) {
       state.abortController.abort()
-      state.isGenerating = false
+      isGenerating.value = false
     }
   }
 
@@ -52,7 +59,7 @@ export default function useApplication (options: ApplicationOptions) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + options.apiKey,
+        'Authorization': 'Bearer ' + get(options.params, 'apiKey', options.apiKey),
       },
       body: JSON.stringify(options.params),
     }
@@ -63,24 +70,27 @@ export default function useApplication (options: ApplicationOptions) {
   }
 
   function onSend () {
-    console.log(options.params);
     if (loadingInstance) {
       loadingInstance.close()
     }
-    loadingInstance = ElLoading.service({
-      lock: true,
-      text: '生成中...',
-      background: 'rgba(0, 0, 0, 0.7)',
-    })
-    state.isGenerating = true
+
+    if (options.showLoading) {
+      loadingInstance = ElLoading.service({
+        lock: true,
+        text: options.loadingText || '生成中...',
+        background: 'rgba(0, 0, 0, 0.7)',
+      })
+    }
+    isGenerating.value = true
     sendMessageApi(options.params, state.abortController)
       .then(response => processStreamResponse(response, handleProgress, handleComplete))
       .catch(error => {
         console.error('请求失败:', error)
-        state.isGenerating = false
+        isGenerating.value = false
         if (loadingInstance) {
           loadingInstance.close()
         }
+        options.onError?.(error)
       })
   }
 
@@ -96,5 +106,7 @@ export default function useApplication (options: ApplicationOptions) {
     onStop: abortGeneration,
 
     generatedContent,
+    isGenerating
+
   }
 }

@@ -6,6 +6,7 @@
     <RichText
       v-if="state.init"
       v-model="state.params.richText"
+      ref="richTextRef"
     />
   </div>
   <Plugins />
@@ -27,10 +28,20 @@ let state = reactive({
   }
 })
 
+const richTextRef = ref(null)
+
+
+
+function getSelectionText() {
+  const editor = richTextRef.value.editor
+  if (editor == null) return ''
+  return editor.getSelectionText()
+}
 onMounted(() => {
   setTimeout(() => {
     state.init = true
   }, 0)
+
   if(route.query.documentId){
     let richText = sessionStorage.getItem(route.query.documentId + 'richText') || ''
     state.params.richText = richText

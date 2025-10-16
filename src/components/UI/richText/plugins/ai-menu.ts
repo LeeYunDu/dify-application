@@ -1,5 +1,6 @@
-import { ISelectMenu, IDomEditor, Boot } from '@wangeditor/editor'
-
+import { ISelectMenu, IDomEditor, Boot, SlateEditor, SlateNode, SlateElement } from '@wangeditor/editor'
+import { cloneDeep } from 'lodash-es'
+import PubSub from 'pubsub-js'
 class AiMenu implements ISelectMenu {
   title: string
   tag: string
@@ -15,11 +16,6 @@ class AiMenu implements ISelectMenu {
     // TS 语法
     // getOptions(editor) {            // JS 语法
     const options = [
-      // {
-      //   value: 'beijing',
-      //   text: '北京',
-      //   styleForRenderMenuList: { 'font-size': '32px', 'font-weight': 'bold' },
-      // },
       { value: 'polish', text: '润色', },
       { value: 'optimize', text: '优化' },
     ]
@@ -49,13 +45,30 @@ class AiMenu implements ISelectMenu {
 
   // 点击菜单时触发的函数
   exec (editor: IDomEditor, value: string | boolean) {
-    console.log(editor, value);
-    editor.insertText(value as string)
-    editor.insertText(' ')
+    const newSelection = editor.selection
+    PubSub.publish('ai-menu', {
+      editor,
+      eventKey: value,
+      editContent: editor.getSelectionText(),
+      content: editor.getText()
+    })
 
-    // TS 语法
-    // exec(editor, value) {                              // JS 语法
-    // Select menu ，这个函数不用写，空着即可
+    // 替换选中的内容
+    switch (value) {
+      case 'polish':
+        // SlateEditor.marks(editor)
+        // 对选择的文字添加浅蓝色的背景色
+        editor.addMark('bgColor', 'lightblue')
+        // editor.insertText('<span id="polish"></span>')
+        // editor.addMark('bold', true)
+        // editor.insertText('润色')
+        break
+      case 'optimize':
+        // editor.insertText('优化')
+        break
+      default:
+        break
+    }
   }
 }
 const aiMenuConf = {
