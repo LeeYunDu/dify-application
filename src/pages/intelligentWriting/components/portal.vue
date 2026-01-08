@@ -52,7 +52,7 @@ const state = reactive({
 let router = useRouter()
 function goBack(){
   router.push({
-    path: '/intelligentWriting/index',
+    path: '/application/index',
   })
 }
 

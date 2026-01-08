@@ -5,6 +5,7 @@
     destroy-on-close
     append-to-body
     class="simple-modal"
+    :class="{ 'no-title': !hasTitle }"
     @close="onCancel"
   >
     <template v-for="( slot, slotKey ) in $slots" #[slotKey]>
@@ -38,6 +39,9 @@ const show = computed({
   set: val => emits('update:modelValue',val)
 })
 
+const hasTitle = computed(() => {
+  return _.hasIn($attrs, 'title') && $attrs.title !== ''
+})
 
 const btnLoading = ref(false)
 
@@ -62,6 +66,7 @@ const onCancel = () => {
     border-radius: 0;
     // padding: 0 ;
     .el-dialog__header {
+      
       display: flex;
       justify-content: center;
       align-items: end;
@@ -84,6 +89,14 @@ const onCancel = () => {
         line-height: 28px;
       }
 
+    }
+
+    &.no-title {
+      .el-dialog__header {
+        height: 0;
+        padding: 0;
+        overflow: hidden;
+      }
     }
 
     .el-dialog__body {

@@ -2,94 +2,101 @@
   <div class="write-application">
     <div class="page-container">
       <div class="page-title" @click="getAppInfo">
-        <span>智能写作</span>
+        <span>深度创作·专业模版AI写作</span>
       </div>
       <div class="page-section-title">
-        <span>智能写作，让文字创作变得轻松快捷</span>
-      </div>
-      <div class="page-action-button">
-        <el-button type="primary" size="large" @click="onCreateDocument">新建文档</el-button>
-        <el-button type="default" size="large">本地导入</el-button>
+        <span>专注于生成高质量、结构化且内容丰富的长文本文章</span>
       </div>
 
-      <div class="write-actions">
-        <el-radio-group v-model="writeAction" size="large" fill="#1890ff">
-          <el-radio-button label="快速帮写" value="quick">快速帮写</el-radio-button>
-          <el-radio-button label="写作模版" value="template">写作模版</el-radio-button>
-        </el-radio-group>
-      </div>
-      <div class="write-quick-panel">
-        <div class="clear-button">
-          <el-button type="default" @click="onClear">清除</el-button>
-        </div>
-        <div class="tip">
-          <img :src="imgPath('application/write/small.png')" alt="">
-          嗨！今天想写些什么？
-        </div>
-        <TagSelect ref="tagSelectRef" v-model="selectedTags"></TagSelect>
-
-        <div class="text-area-panel">
-          <el-input
-            v-model="state.params.query"
-            placeholder="可以在此自由输入更多描述要求"
-            type="textarea"
-            :autosize="{ minRows: 4, maxRows: 4 }"
-          ></el-input>
-
-
-          <el-button type="primary" @click="onGenerate">生成文章</el-button>
+      <div class="quickly-write">
+        <div class="quick-item" v-for="item in quicklyWrite" :key="item.title"
+            @click="state.show = true"
+        
+        >
+         <div class="info">
+           <div class="title">{{item.title}}</div>
+          <div class="quick-content">{{item.content}}</div>
+         </div>
+         <img :src="imgPath(item.icon)" class="icon" alt="">
         </div>
       </div>
-
-      <div class="select-tip-tag-panel">
-        <div class="panel-title">试试这些提示词吧</div>
-
-        <div class="tags">
-          <el-button
-            v-for="tag in tipTags"
-            :key="tag.key"
-            type="default"
-            @click="onAddTag(tag.key)"
-          >
-            {{ tag.label }}
-          </el-button>
-        </div>
-
-        <el-button type="text" @click="onTryTemplate">尝试我们提供的写作模版  ></el-button>
-      </div>
+      
+      
       <div class="page-module">
-        <div class="module-title">基础写作</div>
+        <div class="module-title">创作历史</div>
         <div class="write-ai-plugins">
-          <div v-for="plugin in writeAIplugins" :key="plugin.key" class="plugin-item">
+          <div 
+            v-for="plugin in writeHistory" :key="plugin.title" class="plugin-item"
+          >
             <div class="main">
-              <img :src="imgPath('application/write/' + plugin.icon)" alt="">
-              <div class="plugin-label">{{ plugin.label }}</div>
-              <div class="plugin-tip">{{ plugin.tip }}</div>
+              <div class="plugin-label">{{ plugin.title }}</div>
+              <div class="plugin-content">{{ plugin.content }}</div>
+               <div class="plugin-footer">
+                <div class="write-status">已完成</div>
+                <div class="write-time">2025-01-05</div>
+              </div>
             </div>
+           
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <QuickDialog  v-model="state.show" />
 </template>
 
 <script setup lang="ts">
 import { ref  ,onMounted,reactive } from 'vue'
-import { imgPath } from '@/utils'
 import { useRouter } from 'vue-router'
-import { tipTags,writeAIplugins } from './json'
-import TagSelect from './components/tagSelect.vue'
-import { ElMessage } from 'element-plus'
-import { getAppInfoApi  } from '@/api'
 import { markdownDocx, Packer } from 'markdown-docx'
 import { ApiProxy, applicationApiKey } from '@/config'
 import useApplication from '@/hooks/use-application'
+import { imgPath } from '@/utils'
+
+import QuickDialog from '@/pages/deepCreation/component/quick-dialog.vue'
+
 const prefix = ApiProxy.java.ai
 
 let router = useRouter()
 let tagSelectRef = ref<any>()
 let writeAction = ref('quick')
 let selectedTags = ref<string[]>([ 'writeType', 'writeTitle', 'writeStyle', 'writeLimit', 'writeOutline', 'writeKeywords' ])
+
+
+let   writeHistory =  [
+    {
+      title:'供电服务指挥分中',
+      content:'供电服务指挥分中是指在供电系统中，为了确保供电的稳定性和可靠性，对供电设备进行指挥和管理的分中单位。它负责监控和管理供电系统中的各种设备，包括电源、变压器、开关、断路器等。'
+    },
+    {
+      title:'2025年3月份月度工作总结报告',
+      content:'2025年3月份，供电服务指挥分中负责监控和管理供电系统中的各种设备，包括电源、变压器、开关、断路器等。在这一个月中，分中单位负责协调和指挥各种设备的运行，确保供电的稳定性和可靠性。'
+    },
+    {
+      title:'2025年5月份工作总结讲话稿',
+      content:'2025年5月份，供电服务指挥分中负责监控和管理供电系统中的各种设备，包括电源、变压器、开关、断路器等。在这一个月中，分中单位负责协调和指挥各种设备的运行，确保供电的稳定性和可靠性。'
+    }
+  ]
+
+let quicklyWrite = [
+  {
+    title:'讲话稿写作',
+    content:'主要用于各种会议、活动、演讲等场合',
+    icon:'/deepCreation/type-1.png'
+  },
+  {
+    title:'研究报告写作',
+    content:'主要用于研究项目、实验报告、技术文档等场景',
+    icon:'/deepCreation/type-2.png'
+  },
+  {
+    title:'创意写作',
+    content:'主要用于创作原创的文章、小说、诗歌等',
+    icon:'/deepCreation/type-3.png'
+  }
+]
+
 function onClear() {
   selectedTags.value = []
   state.params = {
@@ -102,43 +109,16 @@ let state = reactive({
   params: {
     query: ''
   },
+  show:false,
   generatorParams: {}
 })
 
-function onCreateDocument(){
-  router.push({
-    path: '/intelligentWriting/document',
-    query: {
-    }
-  })
-}
 
-function onAddTag(tagKey: string) {
-  if(!selectedTags.value.includes(tagKey)){
-    selectedTags.value.push(tagKey)
-  }else{
-    ElMessage({
-      message: '标签已存在',
-      type: 'warning'
-    })
-  }
-}
 
 function onTryTemplate(){
   writeAction.value = 'template'
 }
 
-
-function getAppInfo(){
-  getAppInfoApi().then(res => {
-    if(res.code === 200){
-      ElMessage({
-        message: '获取应用基本信息成功',
-        type: 'success'
-      })
-    }
-  })
-}
 
 
 // 文本数据的传输
@@ -409,7 +389,7 @@ onMounted(async () => {
   margin-left: -12px;
   margin-right: -12px;
   .plugin-item{
-    width: 16.66%;
+    width: 25%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -417,12 +397,35 @@ onMounted(async () => {
     padding: 12px 6px;
     border-radius: 4px;
 
+
+
+     
+
     .main{
       display: flex;
       flex-direction: column;
       background: white;
       padding: 12px 12px;
-    border-radius: 4px;
+      border-radius: 4px;
+       .plugin-footer{
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        font-size: 12px;
+        line-height: 24px;
+        color: rgba(0, 0, 0, 0.8);
+
+        .write-status{
+          color: #9c3dff;
+        }
+      }
+
+    .plugin-content{
+      font-size: 14px;
+      line-height: 24px;
+      color: rgba(0, 0, 0, 0.8);
+      @include ellipsisMultiline(3)
+    }
 
       &:hover{
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
@@ -431,7 +434,7 @@ onMounted(async () => {
       .plugin-label{
         font-weight: 600;
         color: rgba(0, 0, 0, 1);
-        font-size: 16px;
+        font-size: 18px;
         margin: 6px 0;
       }
       img{
@@ -443,13 +446,41 @@ onMounted(async () => {
 }
 
 
-.text-area-panel{
-  ::v-deep(.el-textarea){
-    .el-textarea__inner{
-      font-size: 18px;
-      background: transparent;
-      border: none;
-      box-shadow: none;
+.quickly-write{
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: -12px;
+  margin-right: -12px;
+  margin-top: 80px;
+
+  .quick-item{
+    width: 33.33%;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+
+    .icon{
+      width: 100px;
+      height: 50px;
+      margin-left: 12px;
+      margin-bottom: 12px;
+    }
+    &:hover{
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+      background: white;
+    }
+
+    .info{
+      .title{
+        color: #262a30;
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 24px;
+        margin-bottom: 12px;
+        font-family: 'PingFang SC', 'Microsoft YaHei', '微软雅黑', '宋体', 'Arial', 'Helvetica', 'sans-serif';
+      }
     }
   }
 }

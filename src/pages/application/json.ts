@@ -35,7 +35,8 @@ export const appType = [
       {
         "icon": imgPath("/application/block-20.png"),
         "name": "深度创作",
-        "describes": "专注于生成高质量、结构化且内容丰富的长文本文章"
+        "describes": "专注于生成高质量、结构化且内容丰富的长文本文章",
+        "path": "/deepCreation/index"
       },
       {
         "icon": imgPath("/application/block-21.png"),

@@ -51,7 +51,7 @@ export const bussinessRoutes: Array<any> = [
     path: '/intelligentWriting',
     name: 'IntelligentWriting',
     component: () => import('@/layouts/router.vue'),
-    meta: { permission: false, title: '智能会议', showHeader: true, showSide: false },
+    meta: { permission: false, title: '智能写作', showHeader: true, showSide: false },
     redirect: '/intelligentWriting/index',
     children: [
       {
@@ -66,6 +66,28 @@ export const bussinessRoutes: Array<any> = [
         component: () => import('@/pages/intelligentWriting/document.vue'),
         meta: { permission: false, title: '智能写作文档', showHeader: false, showSide: false }
       },
+    ]
+  },
+  {
+    path: '/deepCreation',
+    name: 'DeepCreation',
+    component: () => import('@/layouts/router.vue'),
+    meta: { permission: false, title: '深度创作', showHeader: true, showSide: false },
+    redirect: '/deepCreation/index',
+    children: [
+      {
+        path: 'index',
+        name: 'DeepCreationIndex',
+        component: () => import('@/pages/deepCreation/index.vue'),
+        meta: { permission: false, title: '深度创作', showHeader: false, showSide: false }
+      },
+      {
+        path: 'document',
+        name: 'DeepCreationDocument',
+        component: () => import('@/pages/intelligentWriting/document.vue'),
+        meta: { permission: false, title: '深度创作', showHeader: false, showSide: false }
+      },
+
     ]
   }
 ]

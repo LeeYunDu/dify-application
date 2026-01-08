@@ -62,6 +62,7 @@ import { ref } from 'vue'
 import { FieldItem } from '@/typings/items'
 import { imgPath } from '@/utils'
 import { appType } from './json'
+import { ElMessage } from 'element-plus'
 
 let router = useRouter()
 
@@ -85,8 +86,14 @@ function handleMouseLeave(app) {
 }
 
 function onClickOutside (app) {
-  console.log(app)
-  router.push({ path: app.path })
+  if(app.path){
+    router.push({ path: app.path })
+  }else{
+    ElMessage({
+      message: '该应用暂未开放',
+      type: 'warning',
+    })
+  }
 }
 
 </script>

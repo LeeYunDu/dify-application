@@ -9,7 +9,7 @@
     />
     <Editor
       v-model="valueHtml"
-      style="height: 100%; overflow-y: hidden;"
+      class="editor-container"
       :default-config="editorConfig"
       :mode="mode"
       @on-created="handleCreated"
@@ -250,6 +250,7 @@ defineExpose({
   border: 1px solid #ccc;
   z-index: 3;
   height: 100%;
+  overflow: hidden;
 
   .ToolBar{
     border: 1px solid #ccc;
@@ -262,6 +263,12 @@ defineExpose({
     margin: 10px auto;
     max-width: 1500px;
     padding: 0 16px;
+    z-index: 100;
   }
+}
+
+.editor-container{
+  height:calc(100% - 100px)!important;
+  overflow: hidden;
 }
 </style>

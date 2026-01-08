@@ -33,7 +33,7 @@
               </div>
             </div>
             <div class="input-content">
-              <input v-model="state.params.query" placeholder="如果对上方内容不太满意，您可以继续提出您的要求" value="">
+              <input v-model="state.params.query" placeholder="自由描述你的要求" value="">
             </div>
 
             <div class="button-group">
@@ -71,7 +71,8 @@ let state = reactive({
   isSuccess:false,
   params:{
     content:'',
-    editContent:''
+    editContent:'',
+    query:''
   }
 })
 
@@ -119,8 +120,9 @@ function onApply(){
         // editor.insertText(generatedContent.value).
         editor.dangerouslyInsertHtml(generatedContent.value)
         editor.deselect()
-        generatedContent.value = ''
-        state.isSuccess = false
+
+        
+        hidePolish()
     }, 0);
   } catch (error) {
     console.log(error,'插入失败');
@@ -132,7 +134,11 @@ function showPolish() {
 }
 
 function hidePolish() {
+  generatedContent.value = ''
+  state.isSuccess = false
+  state.params.query = ''
   state.show = false
+  
 }
 
 function onClear(){
